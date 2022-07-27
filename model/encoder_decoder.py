@@ -18,16 +18,13 @@ class Encoder_Decoder(nn.Module):
         self.object_pix_criterion = nn.NLLLoss(reduction='none')
         self.param_n = params['n']
     
-
     def forward(self, params, x, x_mask, C_y,
                 P_y, C_re, P_re, P_position, y_mask, re_mask, length):
-
         #encoder
         ctx, ctx_mask = self.encoder(x, x_mask)
         ctx_mean = (ctx * ctx_mask[:, None, :, :]).sum(3).sum(2) \
                     / ctx_mask.sum(2).sum(1)[:, None]
         init_state = torch.tanh(self.init_context(ctx_mean))
-
         #decoder
         predict_objects, predict_relations,predict_objects_pix = self.decoder(ctx, ctx_mask,
             C_y, P_y, y_mask, P_re, P_position, init_state, length)
